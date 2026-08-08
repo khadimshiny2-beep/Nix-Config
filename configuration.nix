@@ -110,6 +110,7 @@
     bat
     polkit_gnome # polkit auth agent for the Hyprland session
     kitty
+    obs-studio
   ];
 
   # --- Programs ---
