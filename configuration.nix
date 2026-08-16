@@ -129,9 +129,15 @@
     unimatrix
     pipes-rs
     figlet
-    gotop 
+    gotop
+    quota
+    wl-clipboard
+    ani-cli
+    anime4k 
 
   ];
+  # --- Display & Desktop Environment (Cinnamon) ---
+  services.desktopManager.plasma6.enable = true;
 
   # --- Programs ---
   programs.fish.enable = true;
@@ -160,6 +166,7 @@
     gpl = "git pull";
     gd  = "git diff";
     gl  = "git log --oneline --graph --decorate";
+    nf  = "touch";
 
     # --- Navigation & Utilities ---
     ".."   = "cd ..";
