@@ -77,7 +77,6 @@
     vscode
     chromium
     discord
-    copyq
     obsidian
     starship
     blender
@@ -133,7 +132,14 @@
     quota
     wl-clipboard
     ani-cli
-    anime4k 
+    anime4k
+    htop 
+    btop
+    kdePackages.kate        # full-featured text editor (KWrite's bigger sibling)
+    kdePackages.konsole     # KDE terminal emulator
+    kdePackages.dolphin     # KDE file manager, if you want it
+    kdePackages.ark # archive manager
+    chezmoi
 
   ];
   # --- Display & Desktop Environment (Cinnamon) ---
@@ -150,6 +156,8 @@
     nup  = "nix flake update";
     ncg  = "nix-collect-garbage -d";
     np   = "nix-shell -p";
+    nupd  = "sudo nix-channel --update";
+    ned = "nvim /etc/nixos/configuration.nix";
 
     # --- Git ---
     g   = "git";
