@@ -140,7 +140,10 @@
     kdePackages.dolphin     # KDE file manager, if you want it
     kdePackages.ark # archive manager
     chezmoi
-
+    llvmPackages.clang-tools
+    tree-sitter
+    fzf
+    aria2 
   ];
   # --- Display & Desktop Environment (Cinnamon) ---
   services.desktopManager.plasma6.enable = true;
@@ -149,15 +152,15 @@
   programs.fish.enable = true;
   programs.fish.shellAliases = {
     # --- Nix & NixOS ---
-    nos  = "sudo nixos-rebuild switch";
+    nors  = "sudo nixos-rebuild switch";
     nosf = "sudo nixos-rebuild switch --flake .";
     nob  = "sudo nixos-rebuild boot";
     testnix = "sudo nixos-rebuild test";
     nup  = "nix flake update";
     ncg  = "nix-collect-garbage -d";
     np   = "nix-shell -p";
-    nupd  = "sudo nix-channel --update";
-    ned = "nvim /etc/nixos/configuration.nix";
+    nupdate  = "sudo nix-channel --update";
+    nedit  = "nvim /etc/nixos/configuration.nix";
 
     # --- Git ---
     g   = "git";
