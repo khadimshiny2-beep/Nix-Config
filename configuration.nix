@@ -147,7 +147,8 @@
   ];
   # --- Display & Desktop Environment (Cinnamon) ---
   services.desktopManager.plasma6.enable = true;
-
+  # --- Hyprland DMS powerbutton
+  services.logind.powerKey = "ignore";
   # --- Programs ---
   programs.fish.enable = true;
   programs.fish.shellAliases = {
@@ -157,8 +158,12 @@
     nob  = "sudo nixos-rebuild boot";
     testnix = "sudo nixos-rebuild test";
     nup  = "nix flake update";
-    ncg  = "nix-collect-garbage -d";
-    np   = "nix-shell -p";
+    ncg  = "nix-collect-garbage -d";# collect garbage
+    ndgen_3 = "sudo nix-env --delete-generations +3 --profile /nix/var/nix/profiles/system"; # Deletes old generations (keeping last 3, adjust as needed)
+    ndgen_old = "nix-env --delete-generations old"; # Also clean user profile generations
+    nopt = "sudo nix-store --optimise"; # Optimizes store (dedup identical files via hardlinks) — can free a surprising amount
+    
+    nshell  = "nix-shell -p";
     nupdate  = "sudo nix-channel --update";
     nedit  = "nvim /etc/nixos/configuration.nix";
 
