@@ -113,6 +113,7 @@
     bat
     polkit_gnome # polkit auth agent for the Hyprland session
     kitty
+    ghostty
     obs-studio
     hyprglass
     wine
@@ -124,6 +125,7 @@
     zathuraPkgs.zathura_pdf_poppler
     supabase-cli# poppler backend for zathura
     tty-clock
+    tmux
     peaclock
     unimatrix
     pipes-rs
@@ -139,12 +141,15 @@
     kdePackages.konsole     # KDE terminal emulator
     kdePackages.dolphin     # KDE file manager, if you want it
     kdePackages.ark # archive manager
+    kdePackages.kclock
     chezmoi
     llvmPackages.clang-tools
     tree-sitter
     fzf
     aria2 
   ];
+  # --- Display World Clock on Terminal --- 
+  environment.variables.TZDIR = "/etc/zoneinfo";
   # --- Display & Desktop Environment (Cinnamon) ---
   services.desktopManager.plasma6.enable = true;
   # --- Hyprland DMS powerbutton
