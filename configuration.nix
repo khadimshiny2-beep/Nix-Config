@@ -147,12 +147,25 @@
     tree-sitter
     fzf
     aria2 
+    wmctrl
+    xdotool
+    sqls
+    sqlfluff
+    glances
+    alsa-utils 
+    pulseaudio
+    pulseaudioFull
+    ffmpeg
   ];
+  # --- For temperature in Glances ---
+  hardware.sensor.iio.enable = true;
+  boot.kernelModules = [ "coretemp" ];
+  
   # --- Display World Clock on Terminal --- 
   environment.variables.TZDIR = "/etc/zoneinfo";
   # --- Display & Desktop Environment (Cinnamon) ---
   services.desktopManager.plasma6.enable = true;
-  # --- Hyprland DMS powerbutton
+  # --- Hyprland DMS powerbutton ---Gueye
   services.logind.powerKey = "ignore";
   # --- Programs ---
   programs.fish.enable = true;
@@ -206,19 +219,37 @@
     mv  = "mv -iv";
     rm  = "rm -iv";
     cls = "clear";
-  };
 
+    # --- DMS --- 
+    binds = "nvim ~/.config/hypr/dms/binds.conf"; 
+    
+    # --- Glances --- 
+    glances-fetch = "glances --fetch --fetch-template ~/.config/glances/battery-fetch.jinja";
+
+  };
+   # --- Fish ---
   programs.fish.interactiveShellInit = ''
     fastfetch
     starship init fish | source
   '';
 
+  # --- Steam ---
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = true;
     dedicatedServer.openFirewall = true;
   };
-
+  
+programs.vscode = {
+  enable = true;
+  package = (pkgs.vscode.override {
+    commandLineArgs = [
+      "--enable-features=UseOzonePlatform"
+      "--ozone-platform=wayland"
+      "--disable-gpu-rasterization"
+    ];
+  });
+};
   programs.hyprland = {
     enable = true;
     withUWSM = true; # creates hyprland-session.target / graphical-session.target, required for dms.service
@@ -240,7 +271,13 @@
     enable = true;
     package = pkgs.postgresql_16;
     enableTCPIP = true; # needed so it accepts 127.0.0.1 connections, not just Unix sockets
+    authentication = pkgs.lib.mkOverride 10 ''
+    local all all trust
+    host  all all 127.0.0.1/32 scram-sha-256
+    host  all all ::1/128      scram-sha-256
+  '';
   };
+
 
   # --- Audio & Hardware ---
   security.rtkit.enable = true;
