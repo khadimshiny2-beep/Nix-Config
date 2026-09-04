@@ -142,6 +142,23 @@
     kdePackages.dolphin     # KDE file manager, if you want it
     kdePackages.ark # archive manager
     kdePackages.kclock
+    kdePackages.kdbusaddons
+  # Kvantum engine — one build for Qt6/Plasma6 apps, one for Qt5 apps
+    (catppuccin-kvantum.override {
+    accent = "mauve";
+    variant = "mocha";
+  })
+    (catppuccin-kde.override {
+    flavour = [ "mocha" ];
+    accents = [ "mauve" ];
+  })
+    kdePackages.qtstyleplugin-kvantum
+    libsForQt5.qtstyleplugin-kvantum
+  # Kvantum theme — includes a Mauve/purple variant
+    catppuccin-kvantum
+  # Icons: Papirus base + Catppuccin folder recolor
+    papirus-icon-theme
+    catppuccin-papirus-folders
     chezmoi
     llvmPackages.clang-tools
     tree-sitter
@@ -156,6 +173,7 @@
     pulseaudio
     pulseaudioFull
     ffmpeg
+    jp2a
   ];
   # --- For temperature in Glances ---
   hardware.sensor.iio.enable = true;
