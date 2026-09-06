@@ -174,6 +174,13 @@
     pulseaudioFull
     ffmpeg
     jp2a
+    uv
+    rustc
+    cargo
+    # optional but common additions:
+    rust-analyzer   # LSP for Rust, useful since you're using LazyVim
+    rustfmt
+    clippy
   ];
   # --- For temperature in Glances ---
   hardware.sensor.iio.enable = true;
