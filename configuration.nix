@@ -48,6 +48,8 @@
   # --- Fonts ---
   fonts.packages = with pkgs; [
     nerd-fonts.bigblue-terminal
+    nerd-fonts.jetbrains-mono
+    monocraft
   ];
   fonts.fontconfig.defaultFonts.monospace = [ "BigBlueTerminal Nerd Font Mono" ];
 
@@ -56,7 +58,7 @@
     isNormalUser = true;
     description = "Ahmadoul Khadim Gueye";
     extraGroups = [ "networkmanager" "wheel" ];
-    shell = pkgs.fish;
+    shell = pkgs.zsh;
     packages = with pkgs; [];
   };
 
@@ -74,8 +76,12 @@
     fastfetch
     alacritty
     fish
+    zsh
+    zsh-autosuggestions
+    zsh-syntax-highlighting
     vscode
     chromium
+    firefox
     discord
     obsidian
     starship
@@ -193,8 +199,7 @@
   # --- Hyprland DMS powerbutton ---Gueye
   services.logind.powerKey = "ignore";
   # --- Programs ---
-  programs.fish.enable = true;
-  programs.fish.shellAliases = {
+    programs.fish.shellAliases = {
     # --- Nix & NixOS ---
     nors  = "sudo nixos-rebuild switch";
     nosf = "sudo nixos-rebuild switch --flake .";
@@ -209,6 +214,7 @@
     nshell  = "nix-shell -p";
     nupdate  = "sudo nix-channel --update";
     nedit  = "nvim /etc/nixos/configuration.nix";
+    ncat  = "cat /etc/nixos/configuration.nix";
 
     # --- Git ---
     g   = "git";
@@ -244,7 +250,9 @@
     mv  = "mv -iv";
     rm  = "rm -iv";
     cls = "clear";
-
+    
+    # --- TMUX --- 
+    tmux = "tmux new -s";
     # --- DMS --- 
     binds = "nvim ~/.config/hypr/dms/binds.conf"; 
     
@@ -252,6 +260,136 @@
     glances-fetch = "glances --fetch --fetch-template ~/.config/glances/battery-fetch.jinja";
 
   };
+  programs.fish.enable = true;
+  programs.zsh.shellAliases = {
+    # --- Nix & NixOS ---
+    nors  = "sudo nixos-rebuild switch";
+    nosf = "sudo nixos-rebuild switch --flake .";
+    nob  = "sudo nixos-rebuild boot";
+    testnix = "sudo nixos-rebuild test";
+    nup  = "nix flake update";
+    ncg  = "nix-collect-garbage -d";# collect garbage
+    ndgen_3 = "sudo nix-env --delete-generations +3 --profile /nix/var/nix/profiles/system"; # Deletes old generations (keeping last 3, adjust as needed)
+    ndgen_old = "nix-env --delete-generations old"; # Also clean user profile generations
+    nopt = "sudo nix-store --optimise"; # Optimizes store (dedup identical files via hardlinks) — can free a surprising amount
+    
+    nshell  = "nix-shell -p";
+    nupdate  = "sudo nix-channel --update";
+    nedit  = "nvim /etc/nixos/configuration.nix";
+    ncat  = "cat /etc/nixos/configuration.nix";
+
+    # --- Git ---
+    g   = "git";
+    gs  = "git status";
+    gsb = "git status -s";
+    ga  = "git add";
+    gaa = "git add --all";
+    gc  = "git commit -m";
+    gca = "git commit --amend";
+    gb  = "git branch";
+    gco = "git checkout";
+    gcb = "git checkout -b";
+    gp  = "git push";
+    gpl = "git pull";
+    gd  = "git diff";
+    gl  = "git log --oneline --graph --decorate";
+    nf  = "touch";
+
+    # --- Navigation & Utilities ---
+    ".."   = "cd ..";
+    "..."  = "cd ../..";
+    "...." = "cd ../../..";
+    mkdir  = "mkdir -pv";
+
+    # Modern CLI tools (eza / bat)
+    ls   = "eza --icons --group-directories-first";
+    ll   = "eza -la --icons --octal-permissions";
+    tree = "eza --tree --icons";
+    cat  = "bat --paging=never";
+
+    # Safety & Quick Commands
+    cp  = "cp -iv";
+    mv  = "mv -iv";
+    rm  = "rm -iv";
+    cls = "clear";
+    
+    # --- TMUX --- 
+    tmux = "tmux new -s";
+    # --- DMS --- 
+    binds = "nvim ~/.config/hypr/dms/binds.conf"; 
+    
+    # --- Glances --- 
+    glances-fetch = "glances --fetch --fetch-template ~/.config/glances/battery-fetch.jinja";
+
+  };
+    programs.bash.shellAliases = {
+    # --- Nix & NixOS ---
+    nors  = "sudo nixos-rebuild switch";
+    nosf = "sudo nixos-rebuild switch --flake .";
+    nob  = "sudo nixos-rebuild boot";
+    testnix = "sudo nixos-rebuild test";
+    nup  = "nix flake update";
+    ncg  = "nix-collect-garbage -d";# collect garbage
+    ndgen_3 = "sudo nix-env --delete-generations +3 --profile /nix/var/nix/profiles/system"; # Deletes old generations (keeping last 3, adjust as needed)
+    ndgen_old = "nix-env --delete-generations old"; # Also clean user profile generations
+    nopt = "sudo nix-store --optimise"; # Optimizes store (dedup identical files via hardlinks) — can free a surprising amount
+    
+    nshell  = "nix-shell -p";
+    nupdate  = "sudo nix-channel --update";
+    nedit  = "nvim /etc/nixos/configuration.nix";
+    ncat  = "cat /etc/nixos/configuration.nix";
+
+    # --- Git ---
+    g   = "git";
+    gs  = "git status";
+    gsb = "git status -s";
+    ga  = "git add";
+    gaa = "git add --all";
+    gc  = "git commit -m";
+    gca = "git commit --amend";
+    gb  = "git branch";
+    gco = "git checkout";
+    gcb = "git checkout -b";
+    gp  = "git push";
+    gpl = "git pull";
+    gd  = "git diff";
+    gl  = "git log --oneline --graph --decorate";
+    nf  = "touch";
+
+    # --- Navigation & Utilities ---
+    ".."   = "cd ..";
+    "..."  = "cd ../..";
+    "...." = "cd ../../..";
+    mkdir  = "mkdir -pv";
+
+    # Modern CLI tools (eza / bat)
+    ls   = "eza --icons --group-directories-first";
+    ll   = "eza -la --icons --octal-permissions";
+    tree = "eza --tree --icons";
+    cat  = "bat --paging=never";
+
+    # Safety & Quick Commands
+    cp  = "cp -iv";
+    mv  = "mv -iv";
+    rm  = "rm -iv";
+    cls = "clear";
+    
+    # --- TMUX --- 
+    tmux = "tmux new -s";
+    # --- DMS --- 
+    binds = "nvim ~/.config/hypr/dms/binds.conf"; 
+    
+    # --- Glances --- 
+    glances-fetch = "glances --fetch --fetch-template ~/.config/glances/battery-fetch.jinja";
+
+  };
+    # --- Zsh ---
+  programs.zsh.enable = true;
+  programs.zsh.promptInit = "";
+  programs.zsh.interactiveShellInit = ''
+  fastfetch
+  eval "$(starship init zsh)"
+'';
    # --- Fish ---
   programs.fish.interactiveShellInit = ''
     fastfetch
