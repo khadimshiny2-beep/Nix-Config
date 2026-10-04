@@ -1,18 +1,84 @@
 # Edit this configuration file to define what should be installed on
 # your system. Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
-
 { config, pkgs, ... }:
-  let
-    hyprglass = pkgs.callPackage ./hyprglass.nix { };
-  in {
-      imports = [
-        # Include the results of the hardware scan.
-        ./hardware-configuration.nix
-      ];
 
-  
+let
+  # Shell aliases defined once, shared by fish, zsh and bash
+  aliases = {
+    # --- Nix & NixOS ---
+    nors  = "sudo nixos-rebuild switch";
+    nosf  = "sudo nixos-rebuild switch --flake .";
+    nob   = "sudo nixos-rebuild boot";
+    testnix = "sudo nixos-rebuild test";
+    nup   = "nix flake update";
+    ncg   = "sudo nix-collect-garbage -d"; # collect garbage (sudo so old system generations go too)
+    ndgen_3 = "sudo nix-env --delete-generations +3 --profile /nix/var/nix/profiles/system"; # Deletes old generations (keeping last 3, adjust as needed)
+    ndgen_old = "nix-env --delete-generations old"; # Also clean user profile generations
+    nopt  = "sudo nix-store --optimise"; # Optimizes store (dedup identical files via hardlinks) — can free a surprising amount
+    nshell  = "nix-shell -p";
+    nupdate = "sudo nix-channel --update";
+    nedit   = "nvim /etc/nixos/configuration.nix";
+    ncat    = "cat /etc/nixos/configuration.nix";
+    fetch   = "fetch --infinite";
+    # --- Disk cleanup ---
+    # Empties the trash, wipes the nix eval cache, trims the journal to 100M,
+    # then deletes old system generations and unused store paths.
+    # `command rm` skips the `rm -iv` alias so it doesn't prompt for every file.
+    nclean = "command rm -rf ~/.local/share/Trash/* ~/.cache/nix && sudo journalctl --vacuum-size=100M && sudo nix-collect-garbage -d";
 
+    # --- Git ---
+    g   = "git";
+    gs  = "git status";
+    gsb = "git status -s";
+    ga  = "git add";
+    gaa = "git add --all";
+    gc  = "git commit -m";
+    gca = "git commit --amend";
+    gb  = "git branch";
+    gco = "git checkout";
+    gcb = "git checkout -b";
+    gp  = "git push";
+    gpl = "git pull";
+    gd  = "git diff";
+    gl  = "git log --oneline --graph --decorate";
+    nf  = "touch";
+
+    # --- Navigation & Utilities ---
+    ".."   = "cd ..";
+    "..."  = "cd ../..";
+    "...." = "cd ../../..";
+    mkdir  = "mkdir -pv";
+
+    # Modern CLI tools (eza / bat)
+    ls   = "eza --icons --group-directories-first";
+    ll   = "eza -la --icons --octal-permissions";
+    tree = "eza --tree --icons";
+    cat  = "bat --paging=never";
+
+    # Safety & Quick Commands
+    cp  = "cp -iv";
+    mv  = "mv -iv";
+    rm  = "rm -iv";
+    cls = "clear";
+
+    # --- TMUX ---
+    tmux = "tmux new -s";
+    # --- DMS ---
+    binds = "nvim ~/.config/hypr/dms/binds.conf";
+
+    # --- Glances ---
+    glances-fetch = "glances --fetch --fetch-template ~/.config/glances/battery-fetch.jinja";
+      # --- PostgreSQL ---
+    # Connect to the local server as khadim on mydb (asks for the password)
+    psql = "sudo -u postgres psql`";
+  };
+in
+{
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+  ];
 
   # --- Bootloader & Networking ---
   boot.loader.systemd-boot.enable = true;
@@ -20,6 +86,9 @@
 
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
+
+  # --- Enabling Flakes ---
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # --- Time & Localization ---
   time.timeZone = "Africa/Dakar";
@@ -74,11 +143,13 @@
     wget
     git
     fastfetch
+    fetch
     alacritty
     fish
     zsh
     zsh-autosuggestions
     zsh-syntax-highlighting
+    tldr
     vscode
     chromium
     firefox
@@ -87,7 +158,7 @@
     starship
     blender
     gimp
-    libreoffice-fresh
+    libreoffice
     drawio
     neovim
     yazi
@@ -100,7 +171,7 @@
     lm_sensors
     mission-center
     intel-gpu-tools
-    pgadmin4-desktopmode
+    #pgadmin4-desktopmode
     zoxide
     lolcat
     cowsay
@@ -121,7 +192,6 @@
     kitty
     ghostty
     obs-studio
-    hyprglass
     wine
     statix
     rofi
@@ -129,7 +199,7 @@
     ueberzugpp    # image preview rendering in terminal (needed for Hyprland/Kitty/Ghostty)
     zathura
     zathuraPkgs.zathura_pdf_poppler
-    supabase-cli# poppler backend for zathura
+    supabase-cli  # poppler backend for zathura
     tty-clock
     tmux
     peaclock
@@ -141,41 +211,41 @@
     wl-clipboard
     ani-cli
     anime4k
-    htop 
+    htop
     btop
     kdePackages.kate        # full-featured text editor (KWrite's bigger sibling)
     kdePackages.konsole     # KDE terminal emulator
     kdePackages.dolphin     # KDE file manager, if you want it
-    kdePackages.ark # archive manager
+    kdePackages.ark         # archive manager
     kdePackages.kclock
     kdePackages.kdbusaddons
-  # Kvantum engine — one build for Qt6/Plasma6 apps, one for Qt5 apps
+    # Kvantum engine — one build for Qt6/Plasma6 apps, one for Qt5 apps
     (catppuccin-kvantum.override {
-    accent = "mauve";
-    variant = "mocha";
-  })
+      accent = "mauve";
+      variant = "mocha";
+    })
     (catppuccin-kde.override {
-    flavour = [ "mocha" ];
-    accents = [ "mauve" ];
-  })
+      flavour = [ "mocha" ];
+      accents = [ "mauve" ];
+    })
     kdePackages.qtstyleplugin-kvantum
     libsForQt5.qtstyleplugin-kvantum
-  # Kvantum theme — includes a Mauve/purple variant
+    # Kvantum theme — includes a Mauve/purple variant
     catppuccin-kvantum
-  # Icons: Papirus base + Catppuccin folder recolor
+    # Icons: Papirus base + Catppuccin folder recolor
     papirus-icon-theme
     catppuccin-papirus-folders
     chezmoi
     llvmPackages.clang-tools
     tree-sitter
     fzf
-    aria2 
+    aria2
     wmctrl
     xdotool
     sqls
     sqlfluff
     glances
-    alsa-utils 
+    alsa-utils
     pulseaudio
     pulseaudioFull
     ffmpeg
@@ -187,212 +257,52 @@
     rust-analyzer   # LSP for Rust, useful since you're using LazyVim
     rustfmt
     clippy
+    cargo-edit      # cargo add/rm/upgrade
+    cargo-watch     # cargo watch -x run
+    pkg-config
+    stdenv.cc.cc.lib
+    zlib
+    openssl         # many crates need this + pkg-config to build
+    jetbrains.datagrip
+    zed-editor
+    vopono
+    inxi
+    
   ];
+  # --- Programs ---
+  programs.fish.enable = true;
+  programs.fish.shellAliases = aliases;
+  programs.zsh.shellAliases = aliases;
+  programs.bash.shellAliases = aliases;
+
+  # --- For more compatibility ---
+  programs.nix-ld.enable = true;
+
   # --- For temperature in Glances ---
   hardware.sensor.iio.enable = true;
   boot.kernelModules = [ "coretemp" ];
-  
-  # --- Display World Clock on Terminal --- 
+
+  # --- Display World Clock on Terminal ---
   environment.variables.TZDIR = "/etc/zoneinfo";
-  # --- Display & Desktop Environment (Cinnamon) ---
+
+  # --- Display & Desktop Environment (Plasma) ---
   services.desktopManager.plasma6.enable = true;
-  # --- Hyprland DMS powerbutton ---Gueye
-  services.logind.powerKey = "ignore";
-  # --- Programs ---
-    programs.fish.shellAliases = {
-    # --- Nix & NixOS ---
-    nors  = "sudo nixos-rebuild switch";
-    nosf = "sudo nixos-rebuild switch --flake .";
-    nob  = "sudo nixos-rebuild boot";
-    testnix = "sudo nixos-rebuild test";
-    nup  = "nix flake update";
-    ncg  = "nix-collect-garbage -d";# collect garbage
-    ndgen_3 = "sudo nix-env --delete-generations +3 --profile /nix/var/nix/profiles/system"; # Deletes old generations (keeping last 3, adjust as needed)
-    ndgen_old = "nix-env --delete-generations old"; # Also clean user profile generations
-    nopt = "sudo nix-store --optimise"; # Optimizes store (dedup identical files via hardlinks) — can free a surprising amount
-    
-    nshell  = "nix-shell -p";
-    nupdate  = "sudo nix-channel --update";
-    nedit  = "nvim /etc/nixos/configuration.nix";
-    ncat  = "cat /etc/nixos/configuration.nix";
 
-    # --- Git ---
-    g   = "git";
-    gs  = "git status";
-    gsb = "git status -s";
-    ga  = "git add";
-    gaa = "git add --all";
-    gc  = "git commit -m";
-    gca = "git commit --amend";
-    gb  = "git branch";
-    gco = "git checkout";
-    gcb = "git checkout -b";
-    gp  = "git push";
-    gpl = "git pull";
-    gd  = "git diff";
-    gl  = "git log --oneline --graph --decorate";
-    nf  = "touch";
+  # --- Hyprland DMS powerbutton ---
+  services.logind.settings.Login.HandlePowerKey = "ignore";
 
-    # --- Navigation & Utilities ---
-    ".."   = "cd ..";
-    "..."  = "cd ../..";
-    "...." = "cd ../../..";
-    mkdir  = "mkdir -pv";
 
-    # Modern CLI tools (eza / bat)
-    ls   = "eza --icons --group-directories-first";
-    ll   = "eza -la --icons --octal-permissions";
-    tree = "eza --tree --icons";
-    cat  = "bat --paging=never";
-
-    # Safety & Quick Commands
-    cp  = "cp -iv";
-    mv  = "mv -iv";
-    rm  = "rm -iv";
-    cls = "clear";
-    
-    # --- TMUX --- 
-    tmux = "tmux new -s";
-    # --- DMS --- 
-    binds = "nvim ~/.config/hypr/dms/binds.conf"; 
-    
-    # --- Glances --- 
-    glances-fetch = "glances --fetch --fetch-template ~/.config/glances/battery-fetch.jinja";
-
-  };
-  programs.fish.enable = true;
-  programs.zsh.shellAliases = {
-    # --- Nix & NixOS ---
-    nors  = "sudo nixos-rebuild switch";
-    nosf = "sudo nixos-rebuild switch --flake .";
-    nob  = "sudo nixos-rebuild boot";
-    testnix = "sudo nixos-rebuild test";
-    nup  = "nix flake update";
-    ncg  = "nix-collect-garbage -d";# collect garbage
-    ndgen_3 = "sudo nix-env --delete-generations +3 --profile /nix/var/nix/profiles/system"; # Deletes old generations (keeping last 3, adjust as needed)
-    ndgen_old = "nix-env --delete-generations old"; # Also clean user profile generations
-    nopt = "sudo nix-store --optimise"; # Optimizes store (dedup identical files via hardlinks) — can free a surprising amount
-    
-    nshell  = "nix-shell -p";
-    nupdate  = "sudo nix-channel --update";
-    nedit  = "nvim /etc/nixos/configuration.nix";
-    ncat  = "cat /etc/nixos/configuration.nix";
-
-    # --- Git ---
-    g   = "git";
-    gs  = "git status";
-    gsb = "git status -s";
-    ga  = "git add";
-    gaa = "git add --all";
-    gc  = "git commit -m";
-    gca = "git commit --amend";
-    gb  = "git branch";
-    gco = "git checkout";
-    gcb = "git checkout -b";
-    gp  = "git push";
-    gpl = "git pull";
-    gd  = "git diff";
-    gl  = "git log --oneline --graph --decorate";
-    nf  = "touch";
-
-    # --- Navigation & Utilities ---
-    ".."   = "cd ..";
-    "..."  = "cd ../..";
-    "...." = "cd ../../..";
-    mkdir  = "mkdir -pv";
-
-    # Modern CLI tools (eza / bat)
-    ls   = "eza --icons --group-directories-first";
-    ll   = "eza -la --icons --octal-permissions";
-    tree = "eza --tree --icons";
-    cat  = "bat --paging=never";
-
-    # Safety & Quick Commands
-    cp  = "cp -iv";
-    mv  = "mv -iv";
-    rm  = "rm -iv";
-    cls = "clear";
-    
-    # --- TMUX --- 
-    tmux = "tmux new -s";
-    # --- DMS --- 
-    binds = "nvim ~/.config/hypr/dms/binds.conf"; 
-    
-    # --- Glances --- 
-    glances-fetch = "glances --fetch --fetch-template ~/.config/glances/battery-fetch.jinja";
-
-  };
-    programs.bash.shellAliases = {
-    # --- Nix & NixOS ---
-    nors  = "sudo nixos-rebuild switch";
-    nosf = "sudo nixos-rebuild switch --flake .";
-    nob  = "sudo nixos-rebuild boot";
-    testnix = "sudo nixos-rebuild test";
-    nup  = "nix flake update";
-    ncg  = "nix-collect-garbage -d";# collect garbage
-    ndgen_3 = "sudo nix-env --delete-generations +3 --profile /nix/var/nix/profiles/system"; # Deletes old generations (keeping last 3, adjust as needed)
-    ndgen_old = "nix-env --delete-generations old"; # Also clean user profile generations
-    nopt = "sudo nix-store --optimise"; # Optimizes store (dedup identical files via hardlinks) — can free a surprising amount
-    
-    nshell  = "nix-shell -p";
-    nupdate  = "sudo nix-channel --update";
-    nedit  = "nvim /etc/nixos/configuration.nix";
-    ncat  = "cat /etc/nixos/configuration.nix";
-
-    # --- Git ---
-    g   = "git";
-    gs  = "git status";
-    gsb = "git status -s";
-    ga  = "git add";
-    gaa = "git add --all";
-    gc  = "git commit -m";
-    gca = "git commit --amend";
-    gb  = "git branch";
-    gco = "git checkout";
-    gcb = "git checkout -b";
-    gp  = "git push";
-    gpl = "git pull";
-    gd  = "git diff";
-    gl  = "git log --oneline --graph --decorate";
-    nf  = "touch";
-
-    # --- Navigation & Utilities ---
-    ".."   = "cd ..";
-    "..."  = "cd ../..";
-    "...." = "cd ../../..";
-    mkdir  = "mkdir -pv";
-
-    # Modern CLI tools (eza / bat)
-    ls   = "eza --icons --group-directories-first";
-    ll   = "eza -la --icons --octal-permissions";
-    tree = "eza --tree --icons";
-    cat  = "bat --paging=never";
-
-    # Safety & Quick Commands
-    cp  = "cp -iv";
-    mv  = "mv -iv";
-    rm  = "rm -iv";
-    cls = "clear";
-    
-    # --- TMUX --- 
-    tmux = "tmux new -s";
-    # --- DMS --- 
-    binds = "nvim ~/.config/hypr/dms/binds.conf"; 
-    
-    # --- Glances --- 
-    glances-fetch = "glances --fetch --fetch-template ~/.config/glances/battery-fetch.jinja";
-
-  };
-    # --- Zsh ---
+  # --- Zsh ---
   programs.zsh.enable = true;
   programs.zsh.promptInit = "";
   programs.zsh.interactiveShellInit = ''
-  fastfetch
-  eval "$(starship init zsh)"
-'';
-   # --- Fish ---
+    fetch --infinite
+    eval "$(starship init zsh)"
+  '';
+
+  # --- Fish ---
   programs.fish.interactiveShellInit = ''
-    fastfetch
+    fetch --infinite
     starship init fish | source
   '';
 
@@ -402,17 +312,18 @@
     remotePlay.openFirewall = true;
     dedicatedServer.openFirewall = true;
   };
-  
-programs.vscode = {
-  enable = true;
-  package = (pkgs.vscode.override {
-    commandLineArgs = [
-      "--enable-features=UseOzonePlatform"
-      "--ozone-platform=wayland"
-      "--disable-gpu-rasterization"
-    ];
-  });
-};
+
+  programs.vscode = {
+    enable = true;
+    package = (pkgs.vscode.override {
+      commandLineArgs = [
+        "--enable-features=UseOzonePlatform"
+        "--ozone-platform=wayland"
+        "--disable-gpu-rasterization"
+      ];
+    });
+  };
+
   programs.hyprland = {
     enable = true;
     withUWSM = true; # creates hyprland-session.target / graphical-session.target, required for dms.service
@@ -425,9 +336,6 @@ programs.vscode = {
       enable = true;
       restartIfChanged = true;
     };
-    enableSystemMonitoring = true;
-    enableDynamicTheming = true;
-    enableAudioWavelength = true;
   };
 
   services.postgresql = {
@@ -435,12 +343,11 @@ programs.vscode = {
     package = pkgs.postgresql_16;
     enableTCPIP = true; # needed so it accepts 127.0.0.1 connections, not just Unix sockets
     authentication = pkgs.lib.mkOverride 10 ''
-    local all all trust
-    host  all all 127.0.0.1/32 scram-sha-256
-    host  all all ::1/128      scram-sha-256
-  '';
+      local all all trust
+      host  all all 127.0.0.1/32 scram-sha-256
+      host  all all ::1/128      scram-sha-256
+    '';
   };
-
 
   # --- Audio & Hardware ---
   security.rtkit.enable = true;
@@ -450,7 +357,7 @@ programs.vscode = {
     alsa.support32Bit = true;
     pulse.enable = true;
   };
-  hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable = false;
 
   # --- XDG Portals ---
   xdg.portal.enable = true;
