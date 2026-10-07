@@ -55,6 +55,7 @@ let
     ll   = "eza -la --icons --octal-permissions";
     tree = "eza --tree --icons";
     cat  = "bat --paging=never";
+    grep = "grep -rn -i";
 
     # Safety & Quick Commands
     cp  = "cp -iv";
@@ -142,6 +143,7 @@ in
     vim
     wget
     git
+    github-cli
     fastfetch
     fetch
     alacritty
@@ -165,6 +167,7 @@ in
     vlc
     python3
     python3Packages.pip
+    python314Packages.conda
     gcc
     bitwarden-desktop
     mangohud
@@ -267,6 +270,9 @@ in
     zed-editor
     vopono
     inxi
+    rustnet
+    mapscii
+    binsider
     
   ];
   # --- Programs ---
