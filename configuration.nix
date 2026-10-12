@@ -128,7 +128,7 @@ in
     isNormalUser = true;
     description = "Ahmadoul Khadim Gueye";
     extraGroups = [ "networkmanager" "wheel" ];
-    shell = pkgs.zsh;
+    shell = pkgs.fish;
     packages = with pkgs; [];
   };
 
@@ -152,6 +152,7 @@ in
     zsh-autosuggestions
     zsh-syntax-highlighting
     tldr
+    tlrc
     vscode
     chromium
     firefox
@@ -283,7 +284,7 @@ in
 
   # --- For more compatibility ---
   programs.nix-ld.enable = true;
-
+  programs.nix-ld.libraries = with pkgs; [ stdenv.cc.cc.lib zlib ];
   # --- For temperature in Glances ---
   hardware.sensor.iio.enable = true;
   boot.kernelModules = [ "coretemp" ];
