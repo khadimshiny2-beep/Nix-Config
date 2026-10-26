@@ -1,3 +1,4 @@
+
 # Edit this configuration file to define what should be installed on
 # your system. Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
@@ -72,7 +73,7 @@ let
     glances-fetch = "glances --fetch --fetch-template ~/.config/glances/battery-fetch.jinja";
       # --- PostgreSQL ---
     # Connect to the local server as khadim on mydb (asks for the password)
-    psql = "sudo -u postgres psql`";
+    psql = "sudo -u postgres psql";
   };
 in
 {
@@ -120,6 +121,10 @@ in
     nerd-fonts.bigblue-terminal
     nerd-fonts.jetbrains-mono
     monocraft
+    noto-fonts
+    noto-fonts-cjk-sans
+    noto-fonts-color-emoji
+    font-awesome
   ];
   fonts.fontconfig.defaultFonts.monospace = [ "BigBlueTerminal Nerd Font Mono" ];
 
@@ -127,7 +132,7 @@ in
   users.users."hopemaxxer221" = {
     isNormalUser = true;
     description = "Ahmadoul Khadim Gueye";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
     shell = pkgs.fish;
     packages = with pkgs; [];
   };
@@ -147,6 +152,7 @@ in
     fastfetch
     fetch
     alacritty
+    wezterm
     fish
     zsh
     zsh-autosuggestions
@@ -274,7 +280,72 @@ in
     rustnet
     mapscii
     binsider
-    
+
+    # --- Ported from Omarchy: CLI & dev tools ---
+    jq
+    mise
+    ruff
+    ruby
+    lua5_1
+    luarocks
+    jdk17
+    rustlings
+    lazydocker
+    zellij
+    dua
+    yt-dlp
+    imagemagick
+    vips
+    ffmpegthumbnailer
+    tesseract
+    qrencode
+    zbar
+    socat
+    whois
+    inetutils
+    inotify-tools
+    mongosh
+    mongodb-tools
+
+    # --- Ported from Omarchy: disks & hardware ---
+    testdisk        # includes PhotoRec
+    smartmontools
+    efibootmgr
+    dosfstools
+    exfatprogs
+    ntfs3g
+    brightnessctl
+    ddcutil
+    gnome-disk-utility
+    udiskie
+
+    # --- Ported from Omarchy: Wayland / Hyprland helpers ---
+    grim
+    slurp
+    wtype
+    hyprpicker
+    hyprsunset
+    copyq
+    pamixer
+    pavucontrol
+    gpu-screen-recorder
+
+    # --- Ported from Omarchy: apps ---
+    mpv
+    celluloid
+    evince
+    foot
+    nautilus
+    pinta
+    xournalpp
+    localsend
+    moonlight-qt
+    prismlauncher   # Minecraft
+    jetbrains-toolbox
+    mongodb-compass
+    kdePackages.kdenlive
+    yaru-theme
+    gnome-themes-extra
   ];
   # --- Programs ---
   programs.fish.enable = true;
@@ -303,13 +374,15 @@ in
   programs.zsh.enable = true;
   programs.zsh.promptInit = "";
   programs.zsh.interactiveShellInit = ''
-    fetch --infinite
+    [ "$TERM_PROGRAM" != zed ] && command fetch --infinite
     eval "$(starship init zsh)"
   '';
 
   # --- Fish ---
   programs.fish.interactiveShellInit = ''
-    fetch --infinite
+    if test "$TERM_PROGRAM" != zed
+      fetch
+    end
     starship init fish | source
   '';
 
@@ -372,6 +445,26 @@ in
     pkgs.xdg-desktop-portal-gtk       # Cinnamon
     pkgs.xdg-desktop-portal-hyprland  # Hyprland
   ];
+
+  # --- Ported from Omarchy: services & hardware ---
+  virtualisation.docker.enable = true;   # docker group added to your user above
+  services.printing.enable = true;
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+  };
+  services.thermald.enable = true;
+  zramSwap.enable = true;
+  hardware.bluetooth.enable = true;
+  hardware.graphics = {
+    enable = true;
+    extraPackages = with pkgs; [ intel-media-driver vpl-gpu-rt ];
+  };
+  services.locate = {
+    enable = true;
+    package = pkgs.plocate;
+    localuser = null;   # required when using plocate
+  };
 
   # --- State Version ---
   system.stateVersion = "26.05";
