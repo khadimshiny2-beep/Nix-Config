@@ -460,12 +460,6 @@ in
     enable = true;
     extraPackages = with pkgs; [ intel-media-driver vpl-gpu-rt ];
   };
-  services.locate = {
-    enable = true;
-    package = pkgs.plocate;
-    localuser = null;   # required when using plocate
-  };
-
   # --- State Version ---
   system.stateVersion = "26.05";
 }
