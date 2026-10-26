@@ -380,12 +380,11 @@ in
 
   # --- Fish ---
   programs.fish.interactiveShellInit = ''
-    if test "$TERM_PROGRAM" != zed
+    if set -q KONSOLE_VERSION; or set -q KITTY_WINDOW_ID; or set -q GHOSTTY_RESOURCES_DIR; or set -q WEZTERM_PANE; or set -q ALACRITTY_LOG
       fetch
     end
     starship init fish | source
   '';
-
   # --- Steam ---
   programs.steam = {
     enable = true;
