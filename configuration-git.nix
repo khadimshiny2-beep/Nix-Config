@@ -8,7 +8,7 @@ let
   # Shell aliases defined once, shared by fish, zsh and bash
   aliases = {
     # --- Nix & NixOS ---
-    nors  = "sudo nixos-rebuild switch";
+    nors  = "sudo nixos-rebuild switch --upgrade";
     nosf  = "sudo nixos-rebuild switch --flake .";
     nob   = "sudo nixos-rebuild boot";
     testnix = "sudo nixos-rebuild test";
