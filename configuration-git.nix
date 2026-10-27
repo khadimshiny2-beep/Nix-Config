@@ -18,6 +18,7 @@ let
     ndgen_old = "nix-env --delete-generations old"; # Also clean user profile generations
     nopt  = "sudo nix-store --optimise"; # Optimizes store (dedup identical files via hardlinks) — can free a surprising amount
     nshell  = "nix-shell -p";
+    nroll = "sudo nixos-rebuild switch --rollback";
     nupdate = "sudo nix-channel --update";
     nedit   = "nvim /etc/nixos/configuration.nix";
     ncat    = "cat /etc/nixos/configuration.nix";
