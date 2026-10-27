@@ -117,6 +117,11 @@ in
     variant = "";
   };
 
+  # --- MongoDB ---
+services.mongodb = {
+  enable = true;
+  package = pkgs.mongodb-ce;   # prebuilt binary release, no compiling
+};
   # --- Fonts ---
   fonts.packages = with pkgs; [
     nerd-fonts.bigblue-terminal
@@ -454,7 +459,10 @@ in
     nssmdns4 = true;
   };
   services.thermald.enable = true;
-  zramSwap.enable = true;
+  zramSwap = {
+    enable = true;
+    memoryPercent = 100;
+  };
   hardware.bluetooth.enable = true;
   hardware.graphics = {
     enable = true;
