@@ -265,6 +265,7 @@ services.mongodb = {
     pulseaudio
     pulseaudioFull
     ffmpeg
+    deno
     jp2a
     uv
     rustc
